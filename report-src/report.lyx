@@ -1,0 +1,1380 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass paper
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Booty
+\end_layout
+
+\begin_layout Author
+Alex Hixon
+\end_layout
+
+\begin_layout SubTitle
+Subverting the Windows 7 Bootloader
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Abstract
+\end_layout
+
+\begin_layout Standard
+With the new Windows NT6 series, Microsoft have removed the traditional
+ NTLDR method of booting the system.
+ It's replacement, bootmgr and winload, aim to simplify boot management,
+ minimise code duplication and provide decent support for up and coming
+ UEFI systems running on Intel and AMD machines.
+\end_layout
+
+\begin_layout Standard
+With this, however, comes an increased number of attack vectors.
+ This report will look at these, and discuss the implementation details
+ on an attack which circumvents the boot process and attempts to provide
+ a method to steal user data without alerting the user of its existence.
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Standard
+The standard boot procedure is shown in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:Windows-7-Startup"
+
+\end_inset
+
+.
+ Follows is a brief overview of the boot process for Windows NT6.
+ 
+\end_layout
+
+\begin_layout Standard
+Upon startup, 
+\family typewriter
+bootmgr
+\family default
+ will be executed by the MBR or VBR (volume boot record).
+ It then verfies the checksum of 
+\family typewriter
+bootmgr.exe
+\family default
+, decompresses it, loads it into memory, and finally jumps to protected
+ mode and begins to execute it.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename report-images/bootprocess.png
+	lyxscale 60
+	scale 33
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Windows-7-Startup"
+
+\end_inset
+
+Windows NT6 Startup Procedure
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On Windows 7, 
+\family typewriter
+bootmgr
+\family default
+ is comprised of 3 concatenated exectuables: 
+\end_layout
+
+\begin_layout Itemize
+a 16-bit stub which does intialisation 
+\end_layout
+
+\begin_layout Itemize
+uncompressed PE executable
+\end_layout
+
+\begin_layout Itemize
+a 64-bit (or 32-bit, depending on the platform) PE executable that contains
+ the real 'bootmgr.exe' application.
+ This handles selecting the chosen boot device, and any boot options.
+\end_layout
+
+\begin_layout Quote
+
+\emph on
+Note
+\emph default
+: Vista, too, has a bootmgr application, however its 16-bit stub does not
+ include decompression as the native 
+\family typewriter
+bootmgr.exe
+\family default
+ appended to the end itself is not compressed.
+ Although it should be possible to use Vista's 16-bit stub with uncompressed
+ native code following it on Windows 7, this was not tested.
+\end_layout
+
+\begin_layout Standard
+On an UEFI system, bootmgr itself is an EFI boot application.
+ It does not have a stub that does initialisation; instead, it is already
+ executing in protected mode and begins to run as normal.
+ In either case, the same 
+\family typewriter
+winload.exe
+\family default
+ is executed whether the system is booted from BIOS or from UEFI.
+ This, of course, has the implication that any modifications upon 
+\family typewriter
+winload.exe
+\family default
+ would be pre-boot environment agnostic.
+\end_layout
+
+\begin_layout Standard
+It may be useful to think of 
+\family typewriter
+bootmgr
+\family default
+ as a similar application as GRUB - it enables you to select boot targets
+ and runs them.
+\end_layout
+
+\begin_layout Standard
+Once 
+\family typewriter
+bootmgr.exe
+\family default
+ is loaded into memory, it verifies itself and key Windows system files
+ using certificates built into itself.
+\end_layout
+
+\begin_layout Standard
+Once the user selects a valid boot option (or one is automatically selected),
+ bootmgr.exe loads the boot entry's loader program and passes any boot flags.
+ By default, this is 
+\family typewriter
+%windir%
+\backslash
+system32
+\backslash
+winload.exe
+\family default
+.
+ Winload loads the registry hive, any boot drivers, and loads 
+\family typewriter
+NTOSKRNL.exe
+\family default
+ and its dependencies into memory, sets up paging and starts executing the
+ kernel.
+ Drivers must be signed against one of the 5 built-in root CAs.
+\end_layout
+
+\begin_layout Section
+Attack vectors
+\end_layout
+
+\begin_layout Standard
+The following issues stood out:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+winload.exe
+\family default
+ assumes that the 
+\family typewriter
+bootmgr.exe
+\family default
+ that called it was valid and unmodified.
+ (this however may be intentional; to enable another bootloader - such as
+ GRUB - to boot Windows)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+bootmgr.exe
+\family default
+ assumes that it is not modified
+\end_layout
+
+\begin_layout Itemize
+if a certificate is compromised, it cannot be revoked (without an update
+ to the binary being pushed out, which may have its own implications).
+\end_layout
+
+\begin_layout Standard
+I have chosen to take advantage of the first two issues.
+\end_layout
+
+\begin_layout Standard
+I will now proceed to explain how I was able to circumvent the bootloader,
+ and in doing so, was able to load abitrary kernel drivers.
+\end_layout
+
+\begin_layout Standard
+This following information applies to PC/AT BIOS systems, however to the
+ best of the authors' knowledge, 
+\emph on
+this should also apply to UEFI systems
+\emph default
+.
+\end_layout
+
+\begin_layout Standard
+I was targeting a Windows 7 x64 system for this project, though these ideas
+ can be carried over to different architectures and different versions of
+ Windows (provided they're in the NT6 series).
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Subsection
+Permissions
+\end_layout
+
+\begin_layout Standard
+By default, 
+\family typewriter
+bootmgr
+\family default
+ and 
+\family typewriter
+winload.exe
+\family default
+ cannot be modified, as they are owned by the TrustedInstaller group.
+ However, since it assumed the attacker has gained admin privilleges to
+ perform this attack, it is possible just to change ownership of the file
+ to the Administrators group, and then grant ourselves write permissions.
+\end_layout
+
+\begin_layout Standard
+This can be easily done programatically by calling 
+\family typewriter
+SetNamedSecurityInfo
+\family default
+ and 
+\family typewriter
+AdjustTokenPrivilleges
+\family default
+ from 
+\family typewriter
+advapi32.dll
+\family default
+.
+ Using the 
+\family typewriter
+takeown
+\family default
+ and 
+\family typewriter
+cacls
+\family default
+ utilities included with Windows can be used to do the job from a batch
+ script if required.
+\end_layout
+
+\begin_layout Subsection
+Removing self-verification
+\end_layout
+
+\begin_layout Standard
+I first needed to disable any verification done on bootmgr and winload.
+ This was surprisingly trivial.
+ 
+\end_layout
+
+\begin_layout Standard
+Other papers discussing Windows Vista bootloader security
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://www.symantec.com/avcenter/reference/Windows_Vista_Kernel_Mode_Security.pdf
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://www.blackhat.com/presentations/bh-europe-07/Kumar/Whitepaper/bh-eu-07-Kumar
+-WP-apr19.pdf
+\end_layout
+
+\end_inset
+
+ (only found 
+\emph on
+after
+\emph default
+ this project had already half-started, unfortunately) have attempted to
+ circumvent the checks by 
+\begin_inset Quotes eld
+\end_inset
+
+monkey-patching
+\begin_inset Quotes erd
+\end_inset
+
+ throughout, by changing 
+\emph on
+several 
+\emph default
+functions, which if their definitions change or more/less code is added,
+ means that they require modification and different offset targets.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset label
+LatexCommand label
+name "ChangeFunctionBootmgr"
+
+\end_inset
+
+However, I opted to modify the single 
+\family typewriter
+BlImgQueryCodeIntegrityBootOptions
+\family default
+ function.
+ This function, given the current bootmgr application context and two pointers,
+ asks the BCD if certain debugging options are set, and returns their values.
+ One or both are checked to see particular checks should be performed (such
+ as code signing).
+ The modified function always returns that these flags are set, and so allows
+ booting the system with an unsigned 
+\family typewriter
+winload.exe
+\family default
+ and 
+\family typewriter
+bootmgr.exe
+\family default
+ (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Modified-BlImgQueryCodeIntegrity"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename report-images/changes.PNG
+	scale 45
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Modified-BlImgQueryCodeIntegrity"
+
+\end_inset
+
+Modified 
+\family typewriter
+BlImgQueryCodeIntegrity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The reason this works is that if the first of these flags is set when code
+ integrity is initialised, 
+\family typewriter
+bootmgr
+\family default
+ sets an internal state so that any calls to 
+\family typewriter
+ImgpValidateImageHash
+\family default
+ and similar calls (
+\family typewriter
+BlImgLoadBootApplication
+\family default
+, ResInitializeMuiResource - checking if the MUI is valid, and so on) will
+ always return true.
+\end_layout
+
+\begin_layout Standard
+To create the modified bootmgr executable, I utilised a tool called 
+\family typewriter
+bmzip
+\family default
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Available from http://www.coderforlife.com/projects/win7boot/extras/bmzip64.exe
+ - closed source freeware tool released under the Windows 7 EULA
+\end_layout
+
+\end_inset
+
+.
+ This decompresses and extracts the PE+ (MZ) 
+\family typewriter
+bootmgr.exe
+\family default
+ from the bootmgr file, instead of writing one myself.
+ I then recompressed 
+\family typewriter
+bootmgr.exe
+\family default
+, and appended the 16-bit initialisation code to complete the binary.
+ 
+\end_layout
+
+\begin_layout Standard
+The easiest way would merely to have turned these options on in the BCD.
+ However, these can easily be read out by a system tool to determine whether
+ or not the system is in a non-standard state.
+ Also, this would only have disabled file verification for bootmgr, 
+\emph on
+not
+\emph default
+ for the drivers.
+ Previously in Windows Vista, 
+\family typewriter
+DISABLE_INTEGRITY_CHECKS
+\family default
+ could be passed as a boot option string to the loader application (
+\family typewriter
+winload
+\family default
+), but in Windows 7 this has been disabled.
+\end_layout
+
+\begin_layout Subsection
+Unsigned drivers
+\end_layout
+
+\begin_layout Standard
+By this stage, it is now possible to modify winload.exe without any repercussions.
+ To test this hypothesis, I changed a string inside winload, updated the
+ file checksum and booted to see the on-screen text had changed in response
+ to the string change (see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:Running-unsigned-bootmgr.exe"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename report-images/hax.png
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Running-unsigned-bootmgr.exe"
+
+\end_inset
+
+Running unsigned 
+\family typewriter
+winload.exe
+\family default
+; note the non-standard copyright text
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+I then tried to integrate the payload into the bootkit, and it was decided
+ that modifying winload would be the best option.
+ This however, turned out to take a few tries - although each stage provided
+ valuable experience and information, so it wasn't completely a waste to
+ have prior attempts.
+\end_layout
+
+\begin_layout Subsubsection
+Attempt 1
+\end_layout
+
+\begin_layout Standard
+Initally, a code cave was implemented.
+ This was supposed to load the driver image into memory and in doing so
+ load the driver.
+ This was done as follows:
+\end_layout
+
+\begin_layout Enumerate
+Create an additional segment at the end of the file (I made this 0x1000
+ bytes).
+\end_layout
+
+\begin_layout Enumerate
+Update the PE header and image size.
+\end_layout
+
+\begin_layout Enumerate
+After the driver linked list had been enumerated and each driver called
+ with 
+\family typewriter
+LoadImageEx
+\family default
+, add code to jump out to the new segment (codecave).
+\end_layout
+
+\begin_layout Enumerate
+In the code cave, load the driver image into memory (also via 
+\family typewriter
+LoadImageEx
+\family default
+), and return to the original program flow.
+\end_layout
+
+\begin_layout Standard
+Steps 3 and 4 did cause some issues.
+ For starters, the codecave was in a different segment, so one cannot just
+ use a 
+\family typewriter
+JMP
+\family default
+ instruction.
+ There were two options here: either use a 
+\family typewriter
+LJMP
+\family default
+ (long jump) to jump across the segment, or load the address pointer into
+ a register and jump to that address.
+\end_layout
+
+\begin_layout Standard
+The second option was taken, merely because it was easier to code.
+ This had its own issues though.
+ Initially, running the code in virtual machine used for testing would cause
+ the CPU to be reset.
+ Because it was difficult to debug the issue, boot mode debugging was enabled
+ in the BCD and Windbg attached to the virtual machine over a virtual COM
+ port.
+ 
+\end_layout
+
+\begin_layout Standard
+Windbg isn't the most easy to use debugger.
+ It has a poorly designed user interface and a high learning curve.
+ However, after spending some TLC with it, the problem was discovered.
+ The issue was that code execution would jump to an incorrect place in memory.
+ However, what was confusing is that disassembling with IDA Pro showed that
+ the modified executable loads in the correct addresses to the code cave
+ and in theory, should be jumping correctly.
+\end_layout
+
+\begin_layout Standard
+It turns out that 
+\family typewriter
+winload.exe
+\family default
+ is loaded into memory, but not at the expected virtual address.
+ 
+\family typewriter
+bootmgr
+\family default
+ relocates the 
+\family typewriter
+winload.exe
+\family default
+ image after it loads it by running 
+\family typewriter
+LdrRelocateImageWithBias
+\family default
+.
+ Additionally, 
+\family typewriter
+bootmgr
+\family default
+, after loading winload, does not appear to do rebasing on the address we
+ load into the register to jump to.
+ As such, it needs to be done manually.
+ 
+\family typewriter
+winload.exe
+\family default
+ always appears to loaded 0x116000 bytes before its preferred base address
+ and so we subtract this value from the pointers.
+ Suddenly the code jumps to the correct place!
+\end_layout
+
+\begin_layout Standard
+Unfortunately, this did not cause the kernel module to be loaded.
+ In hindsight, this made sense.
+ 
+\family typewriter
+LoadImageEx
+\family default
+ merely loaded the driver into memory.
+ The kernel does not know about the existence of the driver - it is not
+ running until the I/O manager in the Windows Kernel initalises it (Phase
+ 1 of the NT boot process).
+\end_layout
+
+\begin_layout Subsubsection
+Attempt 2
+\end_layout
+
+\begin_layout Standard
+After spending some time researching how the kernel, boot loader and service
+ control manager all interact with each other, and further analysis of winload,
+ an easier way to load the driver at boot time became apparent.
+\end_layout
+
+\begin_layout Standard
+After loading the base system modules, 
+\family typewriter
+NTOSKRNL.EXE
+\family default
+, 
+\family typewriter
+HAL.DLL
+\family default
+, the boot debugger(s), and then resolving their imports, 
+\family typewriter
+winload
+\family default
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "After-loading-the"
+
+\end_inset
+
+iterates over the keys located in 
+\family typewriter
+HKEY_LOCAL_MACHINE
+\backslash
+CurrentControlSet
+\backslash
+Control
+\backslash
+Services
+\family default
+ and finds those with the 
+\family typewriter
+Order
+\family default
+ DWORD set to 
+\family typewriter
+0
+\family default
+ (those with order 1 or higher are loaded by 
+\family typewriter
+NTOSKRNL
+\family default
+).
+ These are then sorted by the 
+\family typewriter
+GroupOrderList
+\family default
+ registry keys, and then, as mentioned previously, iterated over and 
+\family typewriter
+LoadImageEx
+\family default
+ called on each driver and its dependencies.
+ This can be seen in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:'Rooty'-boot-driver"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename report-images/registry.PNG
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:'Rooty'-boot-driver"
+
+\end_inset
+
+'Rooty' boot driver registry entry
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Simply by adding a registry key with 
+\family typewriter
+Order
+\family default
+ set to 0 will cause the driver to load at boot time.
+ In a stealth situation, this registry key could be created before the list
+ iterated and then deleted in the kernel after the driver had been loaded
+ (see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "sec:Detection"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Of course, being unsigned, means by default the driver would not load, unless
+ the specified option was selected by hitting F8 on boot and choosing 
+\family sans
+Load unsigned drivers
+\family default
+.
+ To work around this, a similar patch was developed for bootmgr (see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "ChangeFunctionBootmgr"
+
+\end_inset
+
+).
+ This tells bootmgr to always ignore any signing and verification checks
+ that would normally occur.
+ The patch is listed verbaitum below:
+\begin_inset listings
+lstparams "basicstyle={\sffamily},language={[x86masm]Assembler},tabsize=4"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+; intended to replace BlImgQueryCodeIntegrity 
+\end_layout
+
+\begin_layout Plain Layout
+
+; offset 0x30230
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+mov [rsp+0x10], rbx
+\end_layout
+
+\begin_layout Plain Layout
+
+push rdi
+\end_layout
+
+\begin_layout Plain Layout
+
+sub rsp, 0x20           ; setup stack
+\end_layout
+
+\begin_layout Plain Layout
+
+mov r9b, 1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+mov [rsp+0x30], r9b     ; argument 1
+\end_layout
+
+\begin_layout Plain Layout
+
+mov [rsp+0x38], r9b     ; argument 2
+\end_layout
+
+\begin_layout Plain Layout
+
+mov rbx, 0              ; success?
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+add rsp, 0x20
+\end_layout
+
+\begin_layout Plain Layout
+
+pop rdi
+\end_layout
+
+\begin_layout Plain Layout
+
+retn
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, the driver loads (see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "fig:Success!"
+
+\end_inset
+
+)! Note that disabling PatchGuard is 
+\emph on
+not
+\emph default
+ required.
+\end_layout
+
+\begin_layout Standard
+While the NDIS code works, we cannot perform keylogging, as the keyboard
+ class driver and HID drivers are initialised later on in the boot process.
+ This means it is necessary to increase the Order setting for the rootkit.
+ Since increasing the boot order means the driver is loaded via the Service
+ Control Manager, it must be patched to also ignore unsigned drivers.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename report-images/success.PNG
+	scale 55
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Success!"
+
+\end_inset
+
+Success!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If I was running 32-bit Windows 7, this would not be a problem, as there
+ is no driver signing enforcement.
+\end_layout
+
+\begin_layout Subsubsection
+Attempt 3
+\end_layout
+
+\begin_layout Standard
+Unfortunately, time did not allow to disable PatchGuard.
+ However, this has been done by several others in the past, so the hard
+ work in this area is already complete.
+ Perhaps with more time and/or better time management this may have been
+ possible.
+\end_layout
+
+\begin_layout Standard
+To some extent, circumventing this is 
+\emph on
+beyond the idea of a bootkit 
+\emph default
+and instead part of a rootkit.
+ However, this is only a technicality, as to fulfil all intended requirements
+ by being able to steal users' data, the code must be able to do both.
+\end_layout
+
+\begin_layout Section
+Bootkit Detection
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Detection"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section deals with the detection of the bootkit only, not 
+\end_layout
+
+\begin_layout Subsection
+Current state
+\end_layout
+
+\begin_layout Standard
+There are several ways in which the current bootkit can be detected:
+\end_layout
+
+\begin_layout Itemize
+finding the driver in the current list of loaded kernel modules
+\end_layout
+
+\begin_layout Itemize
+checking the registry for the Service entry (see 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "After-loading-the"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+verifying the checksum and MD5 of modified files on the filesystem
+\end_layout
+
+\begin_layout Itemize
+scanning the memory to check for the existence of the payload driver
+\end_layout
+
+\begin_layout Subsection
+Theoretical
+\end_layout
+
+\begin_layout Standard
+In theory, it is possible to create a rootkit that is almost impossible
+ to detect.
+\end_layout
+
+\begin_layout Standard
+The kernel could be patched after loading into memory to add code to remove
+ the driver from the kernel's list of loaded modules.
+\end_layout
+
+\begin_layout Standard
+Similarly, the Service registry entry could be added during boot so that
+ the driver is loaded and removed after the kernel has intialised the driver.
+\end_layout
+
+\begin_layout Standard
+The two remaining issues, file changes and memory scanning require a slightly
+ more involved solution to get around.
+\end_layout
+
+\begin_layout Subsubsection
+Filesystem changes
+\end_layout
+
+\begin_layout Standard
+As it stands, the system boot files can simply be hashed and checked against
+ their shipped values to see if the files have changed.
+ To work around this, either an NTFS filter driver or intercepts added to
+ the NTFS file system driver.
+ This is possible now because boot system files are verified if they are
+ signed at boot time.
+\end_layout
+
+\begin_layout Standard
+The best way would be to create a copy of winload.exe and bootmgr, and funnel
+ any changes made to winload.exe and bootmgr to these copies using this modified
+ NTFS driver.
+ This way, it would appear from the operating system that both these files
+ are the originals.
+ They would have the original MD5 hash since they are 'read' from the originals,
+ and writes made by updates only update the copies, not the originals that
+ the system boots from.
+ This also prevents updates from removing the bootkit.
+\end_layout
+
+\begin_layout Standard
+The 
+\series bold
+only way
+\series default
+ the bootkit can be detected is from offline disk inspection (ie mounting
+ the disk from another operating system and scanning/verifying file checksums).
+ Note however, that the this is a very unlikely scenario, and in most cases
+ will never occur (especially on desktop systems).
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Memory scanning
+\end_layout
+
+\begin_layout Standard
+Since the driver is (or can be) intialised before any antivirus tools, it
+ is possible to enable hardware breakpoints on memory access to the region
+ where the rootkit driver lies.
+ If the breakpoint is fired, the code could move itself to another kernel
+ page that it has left for itself and hide temporarily.
+\end_layout
+
+\begin_layout Section
+Future
+\end_layout
+
+\begin_layout Standard
+Windows 8, being a continuation of the NT6 series, continues to use to winload
+ and either bootmgr.exe or its UEFI equivilent.
+ 
+\end_layout
+
+\begin_layout Standard
+Unfortunately, I was unable to get 
+\family typewriter
+bmzip
+\family default
+ to decompress bootmgr.
+ A cursory look shows that one of the three executables have been removed,
+ leaving only the 16-bit initialisation code and the architecture dependent
+ PE binary.
+ Otherwise, the organisation of the file looks exactly the same; the main
+ executable is compressed, and it's imagined it would function largely in
+ the same way, apart from small additions of new code.
+\end_layout
+
+\begin_layout Standard
+More importantly, however, is the addition of a 'chain of trust' into the
+ boot process.
+ Note that this applies only to UEFI machines.
+ The Windows 8 boot loader will be signed, and the UEFI chipset will verify
+ that the bootloader is signed with a key that matches the built in keys
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://video.ch9.ms/build/2011/slides/HW-457T_van_der_Hoeven.pptx
+\end_layout
+
+\end_inset
+
+.
+ OEMs (those conforming to the Windows 8 logo program, anyway) are additionally
+ required that this signing be shipped enabled, although it's likely support
+ for disabling this will exist from firmware
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+http://mjg59.dreamwidth.org/5552.html
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+How self-signing (for example, Linux would require this) and key management
+ would work has not been disclosed, but will certainly prove interesting.
+ 
+\end_layout
+
+\begin_layout Standard
+More than likely this will mean that bootkits will need to target yet another
+ layer to get a foothold of the system, although their complexity may mean
+ that this can all be done inside the operating system if an exploit is
+ found in calling out to the boot firwmare, or alternatively if a certificate
+ is compromised, this would make bootkits much easier to distribute, as
+ keys cannot be revoked.
+\end_layout
+
+\begin_layout Section
+Other operating systems
+\end_layout
+
+\begin_layout Standard
+A brief comparison to other major operating systems, and any challenges
+ to creating a bootkit for those platforms.
+\end_layout
+
+\begin_layout Subsection
+Mac OS X
+\end_layout
+
+\begin_layout Standard
+Mac OS X has supported UEFI since 2005, with the introduction of Intel CPUs
+ at the core of their system designs.
+ The first few iterations used the Tiano Core implementation (Intel's reference
+ implementation).
+\end_layout
+
+\begin_layout Standard
+However, Apple decided to stop developing on this platform and use their
+ own implementation.
+ It is up to the reader to decide whether or not this was because of ideas
+ about the unsightly nature of the Tiano codebase, or merely because Apple's
+ boot team were suffereing from Not Invented Here syndrome.
+\end_layout
+
+\begin_layout Standard
+In any case, the current implementation of the platform is very non­standard.
+ By default, the UEFI boot application is loaded off the filesystem from
+\family typewriter
+
+\begin_inset Newline newline
+\end_inset
+
+/System/Library/CoreServices/boot.efi
+\family default
+, unless a different path is specified in the NVRAM, the user holds one
+ of the boot keys (ie holding Option to select a different boot device),
+ or an attached bootable device is detected (such as USB key).
+\end_layout
+
+\begin_layout Standard
+This file can easily be modified on the filesystem, and the firmware will
+ happily boot this file.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+A special checksum algorithm is used on later Apple TV models to make sure
+ the bootloader is 'signed' by Apple.
+ Since it is only a checksum algorithm, the code could easily be reference
+ engineered or even bruteforced to produce a potentially valid bootloader.
+ It is also worth noting that iPhones do NOT use this bootloader.
+\end_layout
+
+\end_inset
+
+ Additionally, unlike Windows NT6, no verification or signing is performed
+ on the bootloader by any of Apple's personal computer offerings, and the
+ file is also written entirely in native code.
+\end_layout
+
+\begin_layout Standard
+Creating a bootkit would therefore be trivially easy.
+\end_layout
+
+\begin_layout Subsection
+Linux
+\end_layout
+
+\begin_layout Standard
+Since the source code to the bootloader is available, malicious code can
+ be added to the GRUB source code, recompiled and then installed on the
+ target system.
+ Optionally, the kernel image can be replaced.
+\end_layout
+
+\begin_layout Standard
+Once again, creating a bootkit would be trivially easy.
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,7 @@
+End of OslLoadDrivers where we jump from starts at 0x4fb1 in the file (starts with 41 5f)
+
+Start of JUMPREPL.exe is 0x3c, up to ".file" in ASCII       - length 0x0A
+Start of CODECAVE.exe is 0x64, up to 0xb4 (not inclusive)   - length 0x50
+
+Length of .booty is 0x1000
+starts at 0x90c00

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1350.5383"
+   height="593.88806"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="bootprocess.svg"
+   inkscape:export-filename="C:\Users\Alex\Documents\Booty\bootprocess.png"
+   inkscape:export-xdpi="66.639999"
+   inkscape:export-ydpi="66.639999">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path4121"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend"
+       style="overflow:visible">
+      <path
+         id="path4142"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3882">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3884" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3886" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3882"
+       id="linearGradient3888"
+       x1="196"
+       y1="510.36218"
+       x2="256"
+       y2="581.36218"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="813.39657"
+     inkscape:cy="290.44363"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="20"
+     fit-margin-left="20"
+     fit-margin-right="20"
+     fit-margin-bottom="20"
+     inkscape:window-width="1316"
+     inkscape:window-height="718"
+     inkscape:window-x="225"
+     inkscape:window-y="225"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(275.9088,-374.21933)">
+    <rect
+       style="fill:url(#linearGradient3888);fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect2985"
+       width="194.16408"
+       height="120"
+       x="95.714287"
+       y="395.21933"
+       rx="14.201709"
+       ry="14.201709" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+       x="151.14287"
+       y="467.79077"
+       id="text3755"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3757"
+         x="151.14287"
+         y="467.79077">BIOS</tspan></text>
+    <rect
+       ry="14.201709"
+       rx="14.201709"
+       y="395.21933"
+       x="315.71429"
+       height="120"
+       width="194.16408"
+       id="rect3771"
+       style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text3773"
+       y="467.79077"
+       x="381.14288"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+       xml:space="preserve"><tspan
+         y="467.79077"
+         x="381.14288"
+         id="tspan3775"
+         sodipodi:role="line">EFI</tspan></text>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect3777"
+       width="342.85715"
+       height="108.57143"
+       x="98.571434"
+       y="581.79077"
+       rx="14.201709"
+       ry="14.201709" />
+    <text
+       xml:space="preserve"
+       style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+       x="128.04335"
+       y="626.39764"
+       id="text3779"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3781"
+         x="128.04335"
+         y="626.39764">Windows Boot Manager</tspan><tspan
+         sodipodi:role="line"
+         x="128.04335"
+         y="657.8783"
+         id="tspan3783"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Consolas;-inkscape-font-specification:Consolas">bootmgr.exe</tspan></text>
+    <g
+       id="g3870"
+       transform="translate(-293.48023,-5.313708)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3795"
+         width="208.85715"
+         height="108.57143"
+         x="38.571434"
+         y="741.79077"
+         rx="14.201709"
+         ry="14.201709" />
+      <text
+         xml:space="preserve"
+         style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+         x="68.04335"
+         y="786.39764"
+         id="text3797"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           x="68.04335"
+           y="786.39764"
+           id="tspan3801">Windows 7</tspan><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Consolas;-inkscape-font-specification:Consolas"
+           id="tspan3805"
+           sodipodi:role="line"
+           x="68.04335"
+           y="817.8783">winload.exe</tspan></text>
+    </g>
+    <g
+       id="g3924"
+       transform="translate(-284.33304,62.838529)">
+      <rect
+         ry="14.201709"
+         rx="14.201709"
+         y="741.79077"
+         x="258.57141"
+         height="108.57143"
+         width="255.08253"
+         id="rect3807"
+         style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3809"
+         y="786.39764"
+         x="288.04333"
+         style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+         xml:space="preserve"><tspan
+           y="786.39764"
+           x="288.04333"
+           sodipodi:role="line"
+           id="tspan3813">Windows Resume</tspan><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Consolas;-inkscape-font-specification:Consolas"
+           id="tspan3830"
+           y="817.8783"
+           x="288.04333"
+           sodipodi:role="line">winresume.exe</tspan></text>
+    </g>
+    <g
+       id="g3918"
+       transform="translate(-286.19091,96.745166)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3820"
+         width="274.88153"
+         height="108.57143"
+         x="538.57141"
+         y="741.79077"
+         rx="14.201709"
+         ry="14.201709" />
+      <text
+         xml:space="preserve"
+         style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+         x="568.04333"
+         y="786.39764"
+         id="text3822"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           x="568.04333"
+           y="786.39764"
+           id="tspan3824">Recovery Mode</tspan><tspan
+           style="font-style:oblique;fill:#555753;-inkscape-font-specification:Segoe UI Oblique"
+           id="tspan3826"
+           sodipodi:role="line"
+           x="568.04333"
+           y="819.44208">Loads hidden WIM</tspan></text>
+    </g>
+    <g
+       id="g3876"
+       transform="translate(-299.82338,-23.17157)"
+       style="opacity:0.43362834">
+      <rect
+         ry="14.201709"
+         rx="14.201709"
+         y="741.79077"
+         x="1078.5714"
+         height="108.57143"
+         width="274.88153"
+         id="rect3834"
+         style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3836"
+         y="786.39764"
+         x="1108.0432"
+         style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+         xml:space="preserve"><tspan
+           id="tspan3838"
+           y="786.39764"
+           x="1108.0432"
+           sodipodi:role="line">Legacy OS (XP etc)</tspan><tspan
+           y="819.44208"
+           x="1108.0432"
+           sodipodi:role="line"
+           id="tspan3840">NTLDR</tspan></text>
+    </g>
+    <g
+       id="g3912"
+       transform="translate(-279.56349,43.40707)">
+      <rect
+         ry="14.201709"
+         rx="14.201709"
+         y="741.79077"
+         x="838.57141"
+         height="108.57143"
+         width="184.88153"
+         id="rect3858"
+         style="fill:#ffffff;fill-opacity:1;stroke:#2e3436;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3860"
+         y="786.39764"
+         x="868.04333"
+         style="font-size:26.43553352px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI"
+         xml:space="preserve"><tspan
+           y="786.39764"
+           x="868.04333"
+           sodipodi:role="line"
+           id="tspan3864">Memory</tspan><tspan
+           id="tspan3868"
+           y="819.44208"
+           x="868.04333"
+           sodipodi:role="line">diagnostics</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-mid:none;marker-end:url(#Arrow2Lend)"
+       d="m 344.74526,515.21933 -75.5043,66.57144"
+       id="path3898"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3771"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#rect3777"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-mid:none;marker-end:url(#Arrow2Lend)"
+       d="m 218.40892,515.21933 28.41779,66.57144"
+       id="path3900"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect2985"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#rect3777"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="M 122.43639,690.3622 -46.051649,752.34559"
+       id="path3902"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3777"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3870"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:bevel;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="m 441.42858,672.37594 337.31945,71.42633"
+       id="path3910"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3777"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3876"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="M 229.01983,690.3622 142.75982,804.6293"
+       id="path3930"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3777"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3924"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend);display:inline"
+       d="m 295.33479,690.3622 69.1517,148.17374"
+       id="path3932"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3777"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3918"
+       inkscape:connection-end-point="d4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="M 371.80185,690.3622 561.41156,791.47136"
+       id="path3936"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0"
+       inkscape:connection-start="#rect3777"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3912"
+       inkscape:connection-end-point="d4" />
+  </g>
+</svg>
